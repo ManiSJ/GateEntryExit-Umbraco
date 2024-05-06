@@ -3,9 +3,15 @@
 @using GateEntryExit_Umbraco.Services.Interfaces;
 
 @inject IGateService _gateService;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor _httpContextAccessor
 
 @{
-    var allGate = await _gateService.GetAllAsync();
+    var pageNumber = _httpContextAccessor.HttpContext.Request.Query["pageNumber"].FirstOrDefault();
+    if(pageNumber == null)
+    {
+        pageNumber = "1";
+    }
+    var allGate = await _gateService.GetAllAsync(Convert.ToInt32(pageNumber));
     var totalItems = allGate.TotalCount;
     var items = allGate.Items;
     var pageSize = 5;
@@ -13,7 +19,7 @@
 }
 
 @functions{
-    
+
 }
 
 <div class="contianer">
@@ -42,7 +48,7 @@
                     @for (int i = 1; i <= totalPages; i++)
                     {
                         <li class="page-item">
-                            <a class="page-link" onclick="">@i</a>
+                            <a class="page-link" href="?pageNumber=@(i)">@i</a>
                         </li>
                     }
                 </ul>
