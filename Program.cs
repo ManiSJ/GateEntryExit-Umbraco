@@ -1,3 +1,6 @@
+using GateEntryExit_Umbraco.Services;
+using GateEntryExit_Umbraco.Services.Interfaces;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()
@@ -6,6 +9,9 @@ builder.CreateUmbracoBuilder()
     .AddDeliveryApi()
     .AddComposers()
     .Build();
+
+builder.Services.AddScoped<IGateService, GateService>();
+builder.Services.AddScoped<IGateEmployeeService, GateEmployeeService>();
 
 WebApplication app = builder.Build();
 
