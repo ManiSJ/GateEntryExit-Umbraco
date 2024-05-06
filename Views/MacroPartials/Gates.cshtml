@@ -3,19 +3,30 @@
 @using GateEntryExit_Umbraco.Services.Interfaces;
 
 @inject IGateService _gateService;
+@inject IGateEmployeeService _gateEmployeeService;
+
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor _httpContextAccessor
 
 @{
-    var pageNumber = _httpContextAccessor.HttpContext.Request.Query["pageNumber"].FirstOrDefault();
-    if(pageNumber == null)
+    var gatePageNumber = _httpContextAccessor.HttpContext.Request.Query["gatePageNumber"].FirstOrDefault();
+    if(gatePageNumber == null)
     {
-        pageNumber = "1";
+        gatePageNumber = "1";
     }
-    var allGate = await _gateService.GetAllAsync(Convert.ToInt32(pageNumber));
-    var totalItems = allGate.TotalCount;
-    var items = allGate.Items;
+
+    var gateEmployeePageNumber = _httpContextAccessor.HttpContext.Request.Query["gateEmployeePageNumber"].FirstOrDefault();
+    if (gateEmployeePageNumber == null)
+    {
+        gateEmployeePageNumber = "0";
+    }
+
+    var allGate = await _gateService.GetAllAsync(Convert.ToInt32(gatePageNumber));   
+    var gateTotalItems = allGate.TotalCount;
+    var gateItems = allGate.Items;
     var pageSize = 5;
-    var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+    var gateTotalPages = (int)Math.Ceiling(gateTotalItems / (double)pageSize);
+
+    var allGateEmployee = await _gateEmployeeService.GetAllAsync(Convert.ToInt32(gateEmployeePageNumber));
 }
 
 @functions{
@@ -35,7 +46,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var gate in items)
+                    @foreach (var gate in gateItems)
                     {
                         <tr>
                             <td>@gate.Name</td>
@@ -45,10 +56,10 @@
             </table>
             <nav>
                 <ul class="pagination justify-content-end">
-                    @for (int i = 1; i <= totalPages; i++)
+                    @for (int i = 1; i <= gateTotalPages; i++)
                     {
                         <li class="page-item">
-                            <a class="page-link" href="?pageNumber=@(i)">@i</a>
+                            <a class="page-link" href="?gatePageNumber=@(i)">@i</a>
                         </li>
                     }
                 </ul>
@@ -56,6 +67,33 @@
         </div>
         <div class="col-md-6">
             <h2>Gate employees from Java Spring Boot</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var gateEmployee in allGateEmployee.Content)
+                    {
+                        <tr>
+                            <td>@gateEmployee.Name</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination justify-content-end">
+                    @for (int i = 1; i <= allGateEmployee.TotalPages; i++)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="?gateEmployeePageNumber=@(i - 1)">@i</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
